@@ -3,3 +3,15 @@
 .idea/
 __pycache__/
 *.pyc
+
+# Generated Replit/Poetry export metadata; project folders keep source only.
+**/poetry.lock
+**/pyproject.toml
+**/pyproject.toml.backup
+**/.replit
+**/replit.nix
+**/replit.nix.backup
+
+# Retired duplicate archive layouts.
+_legacy-flat-layout/
+legacy-customized/
