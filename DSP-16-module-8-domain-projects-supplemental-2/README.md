@@ -1,14 +1,16 @@
-# Module 8: Domain Projects supplemental 2
+# Audit a Route-Week Dataset
 
-Course: Data Science in Python
-Module: Module 8: Domain Projects supplemental 2
+Run `python main.py` on the bundled fictional report or supply `--csv` with the
+same header. Complete `audit_reports` so each record is accepted or rejected
+once. Return accepted route-week pairs in input order and a count for each
+rejection reason. Preserve the input.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
+Use this order. Reject an invalid row if its fields, numeric values, or
+route-week identifiers are malformed. Then check for missing trips, zero
+covered days, and finally a repeated previously accepted route-week. The first
+valid occurrence is kept. A zero-trip row with positive coverage is valid.
 
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+The bundled input contains ten rows. Expect six accepted and one rejection
+for each of the four reasons. As an additional check, put a missing row before
+a valid row for the same route-week. The missing row must not block the valid
+one. Record the rule used before trying a different policy for duplicates.

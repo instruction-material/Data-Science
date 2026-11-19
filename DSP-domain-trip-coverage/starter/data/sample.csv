@@ -1,0 +1,9 @@
+route,week,trips,days
+North,W1,20,2
+South,W1,18,3
+North,W2,24,4
+South,W2,21,3
+North,W3,33,3
+South,W3,,2
+East,W1,0,0
+East,W2,0,2
