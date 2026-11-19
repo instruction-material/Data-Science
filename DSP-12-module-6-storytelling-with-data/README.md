@@ -1,14 +1,5 @@
-# Module 6: Storytelling with Data
+# Write a claim with matching booking denominators
 
-Course: Data Science in Python
-Module: Module 6: Storytelling with Data
+Run main.py in the site IDE or use python main.py with native Python. Use --input PATH in a terminal to compare a copied CSV. Keep the original input. The project uses the standard library.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
-
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+Early has 18 of 24 booked (75.0%). Late has 24 of 40 booked (60.0%). Bookings rose by 6 while booking share fell by 15 percentage points.

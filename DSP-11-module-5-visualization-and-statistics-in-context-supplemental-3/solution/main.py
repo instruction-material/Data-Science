@@ -1,50 +1,79 @@
+"""Compare pooled and within-session correlation."""
+
+import argparse
 import csv
+import json
+from math import isfinite
+from statistics import correlation
+import sys
 from pathlib import Path
 
-#################
-#   CONSTANTS   #
-#################
-
-DATA_FILE = Path("data/sample.csv")
-VALUE_FIELD = "value"
-COUNT_FIELD = "count"
-TOTAL_FIELD = "total"
-AVERAGE_FIELD = "average"
-EMPTY_AVERAGE = 0.0
+BASE = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
+DEFAULT = BASE / "data" / "sample.csv"
 
 
-#################
-#   FUNCTIONS   #
-#################
+def records(path, expected_columns):
+    with open(path, encoding="utf-8-sig", newline="") as stream:
+        rows = csv.reader(stream)
+        if next(rows, []) != expected_columns:
+            raise ValueError("Expected CSV fields: " + ", ".join(expected_columns))
+        for index, row in enumerate(rows, 1):
+            if len(row) != len(expected_columns):
+                raise ValueError(f"Record {index} has an unexpected number of fields")
+            yield index, row
 
 
-def load_values() -> list[int]:
-    """Load integer values from the sample CSV file"""
-    # Read the named value column from each CSV row
-    with DATA_FILE.open(newline="") as handle:
-        reader = csv.DictReader(handle)
-        return [int(row[VALUE_FIELD]) for row in reader]
+def load(path):
+    rows = []
+    for index, (session, temperature, visits) in records(
+        path, ["session", "temperature_c", "visits"]
+    ):
+        try:
+            point = (session, float(temperature), int(visits))
+        except ValueError:
+            raise ValueError(f"Record {index} needs numeric temperature and whole visits") from None
+        if not session or not isfinite(point[1]) or point[2] < 0:
+            raise ValueError(f"Record {index} has an invalid session, temperature or visit count")
+        rows.append(point)
+    return rows
 
 
-def summarize(values: list[int]) -> dict[str, float]:
-    """Summarize the count total and average for the provided values"""
-    total = sum(values)
-    count = len(values)
+def measure(points):
+    """Return the count and rounded Pearson r or an undefined r."""
+    if len(points) < 2:
+        return {"pairs": len(points), "r": None}
+    xs, ys = zip(*points)
+    if min(xs) == max(xs) or min(ys) == max(ys):
+        return {"pairs": len(points), "r": None}
+    return {"pairs": len(points), "r": round(correlation(xs, ys), 3)}
 
-    # Avoid division by zero when a dataset has no rows
-    average = total / count if count else EMPTY_AVERAGE
 
+def split_sessions(rows):
+    """Measure the pooled rows and each distinct session separately."""
+    grouped = {}
+    for session, temperature, visits in rows:
+        grouped.setdefault(session, []).append((temperature, visits))
     return {
-        COUNT_FIELD: count,
-        TOTAL_FIELD: total,
-        AVERAGE_FIELD: average,
+        "pooled": measure([(x, y) for _, x, y in rows]),
+        "sessions": {name: measure(grouped[name]) for name in sorted(grouped)},
     }
 
 
-def main() -> None:
-    """Print the summary for the sample dataset"""
-    print(summarize(load_values()))
+def analyze(rows):
+    return split_sessions(rows)
+
+
+def main(argv=()):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input", type=Path, default=DEFAULT)
+    args = parser.parse_args(list(argv))
+    try:
+        report = analyze(load(args.input))
+    except NotImplementedError as error:
+        print(error)
+        return
+    print(json.dumps(report, allow_nan=False, indent=2))
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:] if "__file__" in globals() and "ipykernel" not in sys.modules else ())

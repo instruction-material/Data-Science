@@ -1,14 +1,5 @@
-# Module 6: Storytelling with Data supplemental 2
+# Tell the same booking story to two audiences
 
-Course: Data Science in Python
-Module: Module 6: Storytelling with Data supplemental 2
+Run main.py in the site IDE or use python main.py with native Python. Use --input PATH in a terminal to compare a copied CSV. Keep the original input. The project uses the standard library.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
-
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+Both captions preserve 18 of 24 (75.0%) and 24 of 40 (60.0%). The planning version names additional evidence needed for a capacity decision.

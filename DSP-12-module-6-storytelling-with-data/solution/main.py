@@ -1,50 +1,90 @@
+"""Write a claim with matching booking denominators."""
+
+import argparse
 import csv
+import json
+from fractions import Fraction
+import sys
 from pathlib import Path
 
-#################
-#   CONSTANTS   #
-#################
-
-DATA_FILE = Path("data/sample.csv")
-VALUE_FIELD = "value"
-COUNT_FIELD = "count"
-TOTAL_FIELD = "total"
-AVERAGE_FIELD = "average"
-EMPTY_AVERAGE = 0.0
+BASE = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
+DEFAULT = BASE / "data" / "sample.csv"
 
 
-#################
-#   FUNCTIONS   #
-#################
+def records(path, expected_columns):
+    with open(path, encoding="utf-8-sig", newline="") as stream:
+        rows = csv.reader(stream)
+        if next(rows, []) != expected_columns:
+            raise ValueError("Expected CSV fields: " + ", ".join(expected_columns))
+        for index, row in enumerate(rows, 1):
+            if len(row) != len(expected_columns):
+                raise ValueError(f"Record {index} has an unexpected number of fields")
+            yield index, row
 
 
-def load_values() -> list[int]:
-    """Load integer values from the sample CSV file"""
-    # Read the named value column from each CSV row
-    with DATA_FILE.open(newline="") as handle:
-        reader = csv.DictReader(handle)
-        return [int(row[VALUE_FIELD]) for row in reader]
+PERIODS = ("early", "late")
 
 
-def summarize(values: list[int]) -> dict[str, float]:
-    """Summarize the count total and average for the provided values"""
-    total = sum(values)
-    count = len(values)
+def load(path):
+    rows = []
+    for index, (period, booked, seats) in records(path, ["period", "booked", "seats"]):
+        try:
+            booked, seats = int(booked), int(seats)
+        except ValueError:
+            raise ValueError(f"Record {index} needs whole booked and seat counts") from None
+        if period not in PERIODS or not 0 <= booked <= seats:
+            raise ValueError(f"Record {index} needs a period and 0 <= booked <= seats")
+        rows.append((period, booked, seats))
+    return rows
 
-    # Avoid division by zero when a dataset has no rows
-    average = total / count if count else EMPTY_AVERAGE
 
+def evidence(rows):
+    """Total numerators and denominators before calculating each rate."""
+    totals = {name: [0, 0] for name in PERIODS}
+    for period, booked, seats in rows:
+        totals[period][0] += booked
+        totals[period][1] += seats
+    return [
+        {"period": name, "booked": booked, "seats": seats,
+         "rate": Fraction(booked, seats) if seats else None}
+        for name, (booked, seats) in totals.items()
+    ]
+
+
+def line(row):
+    numerator = row["booked"]
+    denominator = row["seats"]
+    rate = row["rate"]
+    share = "undefined booking share" if rate is None else f"{float(rate):.1%} booked"
+    return f"{row['period']}: {numerator} of {denominator} seats booked ({share})"
+
+
+def percentage_change(early, late):
+    if early["rate"] is None or late["rate"] is None:
+        return None
+    return round(float(100 * (late["rate"] - early["rate"])), 2)
+
+
+def analyze(rows):
+    early, late = evidence(rows)
     return {
-        COUNT_FIELD: count,
-        TOTAL_FIELD: total,
-        AVERAGE_FIELD: average,
+        "comparison": [line(early), line(late)],
+        "booking_change": late["booked"] - early["booked"],
+        "booking_share_change_percentage_points": percentage_change(early, late),
     }
 
 
-def main() -> None:
-    """Print the summary for the sample dataset"""
-    print(summarize(load_values()))
+def main(argv=()):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input", type=Path, default=DEFAULT)
+    args = parser.parse_args(list(argv))
+    try:
+        report = analyze(load(args.input))
+    except NotImplementedError as error:
+        print(error)
+        return
+    print(json.dumps(report, allow_nan=False, indent=2))
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:] if "__file__" in globals() and "ipykernel" not in sys.modules else ())

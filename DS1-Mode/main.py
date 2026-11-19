@@ -52,19 +52,19 @@ def my_range(nums):
 
 
 def mode(nums):
-    freqencies = {}
+    frequencies = {}
     for num in nums:
-        if num in freqencies:
-            freqencies[num] += 1
+        if num in frequencies:
+            frequencies[num] += 1
         else:
-            freqencies[num] = 1
+            frequencies[num] = 1
     max_so_far = 0
     modes = []
-    for num in freqencies:
-        if freqencies[num] > max_so_far:
+    for num in frequencies:
+        if frequencies[num] > max_so_far:
             modes = [num]
-            max_so_far = freqencies[num]
-        elif freqencies[num] == max_so_far:
+            max_so_far = frequencies[num]
+        elif frequencies[num] == max_so_far:
             modes.append(num)
     return modes
 
@@ -94,10 +94,10 @@ data1 = [-21, -15, -60, -60, -45, -34, -20, -21, -10, -30]
 data2 = [54, 54, 56, 56, 56, 51, 57, 57, 57, 58, 51, 54]
 data3 = [32, 43, 87, 56, 34, 21, 21, 90, 76, 72, 63]
 
-stats1 = summary(data1)
-stats2 = summary(data2)
-stats3 = summary(data3)
+def main():
+    for values in (data1, data2, data3):
+        print_stats(summary(values))
 
-print_stats(stats1)
-print_stats(stats2)
-print_stats(stats3)
+
+if __name__ == "__main__":
+    main()

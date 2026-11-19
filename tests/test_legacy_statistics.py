@@ -18,6 +18,17 @@ class LegacyStatisticsContracts(unittest.TestCase):
             with contextlib.redirect_stdout(io.StringIO()):
                 cls.programs[folder] = runpy.run_path(str(ROOT / folder / "main.py"))
 
+    def test_original_samples_match_their_downloadable_starters(self):
+        pairs = {"DS1-Simple-Stats": "DS1-Simple-Stats-Starter", "DS1-Mode": "DS1-Mode-Starter"}
+        for reference, student in pairs.items():
+            starter = runpy.run_path(str(ROOT / student / "main.py"))
+            solution = self.programs[reference]
+            for key in ("data1", "data2", "data3"):
+                self.assertEqual(starter[key], solution[key], (reference, key))
+            self.assertEqual(len(solution["data3"]), 11)
+            self.assertEqual(solution["my_sum"](solution["data3"]), 595)
+            self.assertEqual(solution["median"](solution["data3"]), 56)
+
     def test_medians_for_unsorted_odd_even_negative_and_repeated_values(self):
         for folder, program in self.programs.items():
             for values in ([3, 1, 2], [4, 1, 3, 2], [-5, -1, -9],

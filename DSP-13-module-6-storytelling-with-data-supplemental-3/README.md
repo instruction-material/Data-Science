@@ -1,14 +1,5 @@
-# Module 6: Storytelling with Data supplemental 3
+# Explain when booking shares cannot be compared
 
-Course: Data Science in Python
-Module: Module 6: Storytelling with Data supplemental 3
+Run main.py in the site IDE or use python main.py with native Python. Use --input PATH in a terminal to compare a copied CSV. Keep the original input. The project uses the standard library.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
-
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+The early session has no seats and no bookings. Its booking share and the rate change are undefined. Late still has 24 of 40 (60.0%).
