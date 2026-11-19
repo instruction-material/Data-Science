@@ -1,49 +1,94 @@
+import argparse
 import csv
 from pathlib import Path
 
-#################
-#   CONSTANTS   #
-#################
-
-DATA_FILE = Path("data/sample.csv")
-VALUE_FIELD = "value"
-COUNT_FIELD = "count"
-TOTAL_FIELD = "total"
-AVERAGE_FIELD = "average"
-EMPTY_AVERAGE = 0.0
+SAMPLE = Path(__file__).parent / "data" / "sample.csv"
+PHASES = ("Before", "After")
 
 
-#################
-#   FUNCTIONS   #
-#################
+def load_observations(path):
+    with path.open(encoding="utf-8", newline="") as stream:
+        reader = csv.DictReader(stream)
+        if reader.fieldnames != ["phase", "week", "loans", "open_hours"]:
+            raise ValueError("Expected phase,week,loans,open_hours")
+        observations = {}
+        for row in reader:
+            if None in row or None in row.values():
+                raise ValueError(f"Malformed record ending at line {reader.line_num}")
+            phase = row["phase"].strip()
+            week = row["week"].strip()
+            key = phase, week
+            if phase not in PHASES or not week or key in observations:
+                raise ValueError(f"Unknown phase or missing/repeated week: {key}")
+            loans = int(row["loans"]) if row["loans"].strip() else None
+            hours = int(row["open_hours"])
+            if (loans is not None and loans < 0) or hours < 0:
+                raise ValueError(f"Negative observation: {key}")
+            observations[key] = loans, hours
+    return observations
 
 
-def load_values() -> list[int]:
-    """Load integer values from the sample CSV file"""
-    # Read the named value column from each CSV row
-    with DATA_FILE.open(newline="") as handle:
-        reader = csv.DictReader(handle)
-        return [int(row[VALUE_FIELD]) for row in reader]
+def format_rate(rate):
+    return "unavailable" if rate is None else f"{rate:.2f}"
 
 
-def summarize(values: list[int]) -> dict[str, float]:
-    """Summarize the count total and average for the provided values"""
-    total = sum(values)
-    count = len(values)
+def summarize(observations):
+    """Return (phase, loans, hours, excluded rows, hourly rate) rows."""
+    output = []
+    for phase in PHASES:
+        loans = hours = excluded = 0
+        for (row_phase, _), (count, covered) in observations.items():
+            if row_phase != phase:
+                continue
+            if count is None or covered == 0:
+                excluded += 1
+                continue
+            loans += count
+            hours += covered
+        output.append((phase, loans if hours else None, hours, excluded, loans / hours if hours else None))
+    return output
 
-    # Avoid division by zero when a dataset has no rows
-    average = total / count if count else EMPTY_AVERAGE
 
-    return {
-        COUNT_FIELD: count,
-        TOTAL_FIELD: total,
-        AVERAGE_FIELD: average,
-    }
+def render_report(rows, source_name):
+    lines = [
+        "# Laptop loans before and after the pilot",
+        "",
+        f"Input: {source_name}. Each observation covers one reported phase-week.",
+        "",
+        "| Phase | Measured loans | Measured hours | Excluded rows | Loans per hour |",
+        "| --- | ---: | ---: | ---: | ---: |",
+    ]
+    for phase, loans, hours, excluded, rate in rows:
+        observed = "unavailable" if loans is None else loans
+        lines.append(f"| {phase} | {observed} | {hours} | {excluded} | {format_rate(rate)} |")
+    before = rows[0][-1]
+    after = rows[1][-1]
+    lines.append("")
+    if before is None or after is None:
+        lines.append("There is insufficient measured coverage for a phase comparison.")
+    else:
+        lines.append(f"After minus Before: {after - before:+.2f} observed loans per open hour.")
+    lines.extend(("", "This observational comparison cannot establish what caused the change."))
+    return "\n".join(lines) + "\n"
 
 
-def main() -> None:
-    """Print the summary for the sample dataset"""
-    print(summarize(load_values()))
+def main():
+    parser = argparse.ArgumentParser(description="Create a reproducible laptop-loan report")
+    parser.add_argument("--csv", type=Path, default=SAMPLE)
+    parser.add_argument("--output", type=Path, default=Path("report.md"))
+    args = parser.parse_args()
+    try:
+        rows = summarize(load_observations(args.csv))
+        if rows is None:
+            print("TODO: summarize both phases using the measured-hours denominator")
+            return
+        if args.csv.resolve() == args.output.resolve():
+            raise ValueError("Choose an output path different from the input")
+        report = render_report(rows, args.csv.name)
+        args.output.write_text(report, encoding="utf-8")
+    except (OSError, ValueError) as error:
+        parser.error(str(error))
+    print(report, end="")
 
 
 if __name__ == "__main__":

@@ -1,14 +1,13 @@
-# Module 9: Data Science Capstone supplemental 3
+# Capstone extension: Stress-Test Coverage
 
-Course: Data Science in Python
-Module: Module 9: Data Science Capstone supplemental 3
+Run `python main.py` in the course IDE or from this folder. Compare the
+default baseline rule of at least one open hour with the rule set by
+`--minimum-hours`, initially seven. Missing loan counts never contribute
+to a rate. Report the number of eligible rows and their measured hours
+beside each rate, and write a conclusion about how the rule matters.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
-
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+Before retains one of two measured rows and its rate stays at 3.00.
+After retains one of three measured rows and its rate changes from 4.00
+to 4.86. At nine hours neither phase supports a rate. Explain why a
+stricter rule can increase a reported rate while reducing the evidence
+available to support it. Keep the input and both rule values with the result.

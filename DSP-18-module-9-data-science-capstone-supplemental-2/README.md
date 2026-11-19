@@ -1,14 +1,16 @@
-# Module 9: Data Science Capstone supplemental 2
+# Capstone transfer: Verify a Data Revision
 
-Course: Data Science in Python
-Module: Module 9: Data Science Capstone supplemental 2
+Run `python main.py` in the course IDE or from this folder. The default
+command compares the original synthetic `data/sample.csv` with
+`data/corrected.csv`. Use `--previous` and `--revised` to compare two other
+snapshots without editing them.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
+Complete `changes` so it reports each added row, removed row, or changed
+field with its phase and week. Compare the key and fields, independent
+of file order. A blank loan count is unavailable, distinct from zero.
+The default change is After W3, loans 8 to 11. The hourly rate in the
+After phase then changes from 4.00 to 4.20.
 
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+Deliver both input versions, their printed fingerprints, and a note
+describing which claim needs rechecking. Check that comparing a
+reordered copy with identical records reports no record changes.
