@@ -1,14 +1,7 @@
-# Module 4: Cleaning and Validation supplemental 2
+# Separate duplicates from conflicting IDs
 
-Course: Data Science in Python
-Module: Module 4: Cleaning and Validation supplemental 2
+Open the starter for the exercise. The separate solution shows one implementation.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
+Run main.py in the course IDE with the bundled input. For native Python 3.14, install pandas with `python -m pip install pandas==3.1.1` and run `python main.py`. Use `--input PATH` to try a separate CSV. A notebook can call `main(["--input", "PATH"])` from the project folder. Keep the original CSV unchanged.
 
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+R02 is an identical repeat after normalization. Two different valid R07 records are both held. Of 11 loaded records, 4 are accepted with total 12 trips.

@@ -1,5 +1,11 @@
-label,value
-alpha,4
-beta,8
-gamma,11
-delta,17
+trip_id,site,trips,hours
+R01, North ,2,1
+R02,north,4,2
+R02,NORTH,4,2
+R03,south,,4
+R04,west,nope,0
+R05,west,-1,3
+R06,west,0,0
+R07,west,12,3
+R08,,3,1
+R09,East,6,3

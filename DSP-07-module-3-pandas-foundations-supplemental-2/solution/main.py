@@ -1,50 +1,58 @@
-import csv
+"""Filter and sort trip records."""
+
+import argparse
+import json
+import sys
 from pathlib import Path
 
-#################
-#   CONSTANTS   #
-#################
-
-DATA_FILE = Path("data/sample.csv")
-VALUE_FIELD = "value"
-COUNT_FIELD = "count"
-TOTAL_FIELD = "total"
-AVERAGE_FIELD = "average"
-EMPTY_AVERAGE = 0.0
+import pandas as pd
 
 
-#################
-#   FUNCTIONS   #
-#################
+COLUMNS = ["trip_id", "site", "trips", "hours"]
+BASE = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
+DEFAULT_INPUT = BASE / "data" / "sample.csv"
 
 
-def load_values() -> list[int]:
-    """Load integer values from the sample CSV file"""
-    # Read the named value column from each CSV row
-    with DATA_FILE.open(newline="") as handle:
-        reader = csv.DictReader(handle)
-        return [int(row[VALUE_FIELD]) for row in reader]
+def load_frame(path):
+    """Read the four-column, complete dataset used in this module."""
+    types = {"trip_id": "string", "site": "string", "trips": "Int64", "hours": "Int64"}
+    frame = pd.read_csv(path, dtype=types)
+    if not isinstance(frame.index, pd.RangeIndex):
+        raise ValueError("A CSV record has more fields than the header")
+    if frame.columns.tolist() != COLUMNS:
+        raise ValueError("Expected columns trip_id, site, trips, hours in that order")
+    if frame.isna().any().any() or frame["trip_id"].duplicated().any():
+        raise ValueError("Expected complete rows and unique trip IDs")
+    if (frame[["trips", "hours"]] < 0).any().any():
+        raise ValueError("Expected nonnegative trips and hours")
+    return frame
 
 
-def summarize(values: list[int]) -> dict[str, float]:
-    """Summarize the count total and average for the provided values"""
-    total = sum(values)
-    count = len(values)
-
-    # Avoid division by zero when a dataset has no rows
-    average = total / count if count else EMPTY_AVERAGE
-
-    return {
-        COUNT_FIELD: count,
-        TOTAL_FIELD: total,
-        AVERAGE_FIELD: average,
-    }
+def select_trips(frame, minimum):
+    """Keep inclusive matches and sort highest trips first, then by ID."""
+    columns = ["trip_id", "site", "trips"]
+    return frame.loc[frame["trips"].ge(minimum), columns].sort_values(
+        ["trips", "trip_id"], ascending=[False, True]
+    )
 
 
-def main() -> None:
-    """Print the summary for the sample dataset"""
-    print(summarize(load_values()))
+
+def analyze(frame):
+    selected = select_trips(frame, minimum=6)
+    return {"minimum": 6, "rows": selected.to_dict(orient="records")}
+
+
+def main(argv=()):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
+    args = parser.parse_args(list(argv))
+    try:
+        result = analyze(load_frame(args.input))
+    except NotImplementedError as error:
+        print(error)
+        return
+    print(json.dumps(result, allow_nan=False, indent=2))
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:] if "__file__" in globals() and "ipykernel" not in sys.modules else ())

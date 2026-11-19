@@ -39,6 +39,8 @@ jobs:
         run: python -B tests/export_dashboard_evidence.py
       - name: Retain fresh reproducibility entrypoints and exact report bytes
         run: python -B tests/export_reproducibility_evidence.py
+      - name: Retain all six tabular examples and source digests
+        run: python -B tests/export_tabular_evidence.py
       - name: Retain the original audit evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

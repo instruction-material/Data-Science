@@ -1,14 +1,7 @@
-# Module 3: pandas Foundations
+# Inspect and group trip records
 
-Course: Data Science in Python
-Module: Module 3: pandas Foundations
+Open the starter for the exercise. The separate solution shows one implementation.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
+Run main.py in the course IDE with the bundled input. For native Python 3.14, install pandas with `python -m pip install pandas==3.1.1` and run `python main.py`. Use `--input PATH` to try a separate CSV. A notebook can call `main(["--input", "PATH"])` from the project folder. Keep the original CSV unchanged.
 
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+Expect six records and four columns. North has 2 records, 6 total trips and mean 3. South has 1, 8 and 8. West has 3, 18 and 6.
