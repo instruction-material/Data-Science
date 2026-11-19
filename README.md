@@ -28,3 +28,24 @@ The loader resolves its dataset beside the source, including runs from another
 working directory. The role README states the exact completion contract.
 Run `bash verify-course-source.sh` to check the source layout, statistics and
 CSV projects. The remaining generic packs still need curriculum alignment.
+
+The grouped-summary studio has three distinct source pairs:
+
+- `DSP-03-data-analysis-lab-13` groups count, total and mean. Its optional
+  label policy merges `north`, `North` and `NORTH` only when their source
+  meaning permits that normalization. Original row dictionaries stay intact.
+- `DSP-24-applied-studio-13-data-analysis-lab-13-supplemental-2` supplies grouping
+  and asks for a Markdown table plus a denominator-aware interpretation. The
+  script cells also work in a notebook opened in the project directory; the
+  terminal prints the same table. A notebook can also pass an explicit CSV path.
+- `DSP-25-applied-studio-13-data-analysis-lab-13-supplemental-3` compares mean
+  with median and maximum. The west sample has mean 34, median 1 and maximum
+  100, making the effect of its extreme value visible.
+
+Each bundled CSV has eight synthetic category/value rows. Normalized north
+has three rows, total 24 and mean 8; south has two rows, total 24 and mean 12;
+west has three rows, total 102 and mean 34. The overall mean is 18.75.
+Empty input produces no groups. Invalid values, missing categories and
+nonfinite values are reported with their record number; finite negatives are
+valid. Counts remain visible and these examples establish no real population
+or causal claim. The original label and numeric text remain recoverable.

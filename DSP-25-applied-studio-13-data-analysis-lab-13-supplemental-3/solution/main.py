@@ -1,49 +1,60 @@
+# %%
+"""Synthetic grouped-summary practice; Python standard library only."""
 import csv
+import math
 from pathlib import Path
+from statistics import median
 
-#################
-#   CONSTANTS   #
-#################
-
-DATA_FILE = Path("data/sample.csv")
-VALUE_FIELD = "value"
-COUNT_FIELD = "count"
-TOTAL_FIELD = "total"
-AVERAGE_FIELD = "average"
-EMPTY_AVERAGE = 0.0
+DATA_FILE = Path(__file__).resolve().parent / "data" / "sample.csv"
 
 
-#################
-#   FUNCTIONS   #
-#################
-
-
-def load_values() -> list[int]:
-    """Load integer values from the sample CSV file"""
-    # Read the named value column from each CSV row
-    with DATA_FILE.open(newline="") as handle:
+def load_rows(path=DATA_FILE):
+    """Read the required columns as original text; parsing happens in grouping."""
+    with Path(path).open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
-        return [int(row[VALUE_FIELD]) for row in reader]
+        if not {"category", "value"}.issubset(reader.fieldnames or []):
+            raise ValueError("CSV requires category and value columns")
+        return list(reader)
 
 
-def summarize(values: list[int]) -> dict[str, float]:
-    """Summarize the count total and average for the provided values"""
-    total = sum(values)
-    count = len(values)
+def summarize_groups(rows, *, normalize_labels=False):
+    """Group finite numeric values without changing any input dictionary.
 
-    # Avoid division by zero when a dataset has no rows
-    average = total / count if count else EMPTY_AVERAGE
+    Labels stay exact by default. Optional normalization strips padding and
+    uses casefold only when the source says those labels identify one group.
+    Missing/blank categories and nonnumeric/nonfinite values raise ValueError
+    with the CSV record number. Negative values are valid in this example.
+    """
+    buckets = {}
+    for record, row in enumerate(rows, start=2):
+        label = row.get("category")
+        if not isinstance(label, str) or not label.strip():
+            raise ValueError(f"Record {record}: category is missing")
+        original_value = row.get("value")
+        try:
+            value = float(original_value)
+        except (TypeError, ValueError) as error:
+            raise ValueError(f"Record {record}: value is not numeric") from error
+        if not math.isfinite(value):
+            raise ValueError(f"Record {record}: value is not finite")
+        key = label.strip().casefold() if normalize_labels else label
+        buckets.setdefault(key, []).append(value)
+    summaries = {}
+    for label in sorted(buckets):
+        values = buckets[label]
+        total = sum(values)
+        summaries[label] = {"count": len(values), "total": total,
+                            "average": total / len(values),
+                            "median": median(values), "maximum": max(values)}
+    return summaries
 
-    return {
-        COUNT_FIELD: count,
-        TOTAL_FIELD: total,
-        AVERAGE_FIELD: average,
-    }
 
-
-def main() -> None:
-    """Print the summary for the sample dataset"""
-    print(summarize(load_values()))
+def main():
+    try:
+        print(summarize_groups(load_rows(), normalize_labels=True))
+        print("Compare median with mean and maximum: an extreme value can lift the mean while most observations stay low. These synthetic groups do not establish population effects.")
+    except NotImplementedError as error:
+        print(str(error))
 
 
 if __name__ == "__main__":

@@ -1,5 +1,9 @@
-label,value
-alpha,4
-beta,8
-gamma,11
-delta,17
+category,value
+north,4
+North,8
+NORTH,12
+south,10
+south,14
+west,100
+west,1
+west,1
