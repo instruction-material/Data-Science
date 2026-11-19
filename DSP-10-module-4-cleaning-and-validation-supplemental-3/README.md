@@ -1,14 +1,7 @@
-# Module 4: Cleaning and Validation supplemental 3
+# Compare two label policies
 
-Course: Data Science in Python
-Module: Module 4: Cleaning and Validation supplemental 3
+Open the starter for the exercise. The separate solution shows one implementation.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
+Run main.py in the course IDE with the bundled input. For native Python 3.14, install pandas with `python -m pip install pandas==3.1.1` and run `python main.py`. Use `--input PATH` to try a separate CSV. A notebook can call `main(["--input", "PATH"])` from the project folder. Keep the original CSV unchanged.
 
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+Label repair accepts 5 of 10 records with 24 trips. Exact labels only accepts 3 of 10 with 16 trips. Report the differences of 2 records and 8 trips.

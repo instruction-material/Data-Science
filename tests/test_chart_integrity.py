@@ -3,6 +3,7 @@ import copy
 import importlib.util
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -85,9 +86,23 @@ class ChartDataTests(unittest.TestCase):
                 load(index, "starter").make_chart({})
 
     def test_native_lock_is_present_in_every_downloadable_role(self):
-        locked = (ROOT / "requirements.txt").read_bytes()
-        self.assertIn(b"matplotlib==3.11.2", locked)
-        self.assertIn(b"--hash=sha256:", locked)
+        def hashed_pins(contents):
+            blocks = re.split(r"(?m)(?=^[a-z][a-z0-9_-]*==)", contents)
+            return {
+                block.split()[0]: set(re.findall(r"--hash=sha256:([a-f0-9]{64})", block))
+                for block in blocks if block and not block.startswith("#")
+            }
+
+        chart_lock = ROOT / FOLDERS[0] / "starter" / "requirements.txt"
+        locked = chart_lock.read_bytes()
+        chart_pins = hashed_pins(chart_lock.read_text())
+        course_pins = hashed_pins((ROOT / "requirements.txt").read_text())
+        self.assertIn("matplotlib==3.11.2", chart_pins)
+        self.assertNotIn("pandas", {pin.split("==")[0] for pin in chart_pins})
+        for pin, hashes in chart_pins.items():
+            with self.subTest(pin=pin):
+                self.assertTrue(hashes)
+                self.assertLessEqual(hashes, course_pins[pin])
         for folder in FOLDERS:
             for role in ["starter", "solution"]:
                 self.assertEqual((ROOT / folder / role / "requirements.txt").read_bytes(), locked)

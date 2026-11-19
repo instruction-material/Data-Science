@@ -1,14 +1,7 @@
-# Module 3: pandas Foundations supplemental 2
+# Filter and sort trip records
 
-Course: Data Science in Python
-Module: Module 3: pandas Foundations supplemental 2
+Open the starter for the exercise. The separate solution shows one implementation.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
+Run main.py in the course IDE with the bundled input. For native Python 3.14, install pandas with `python -m pip install pandas==3.1.1` and run `python main.py`. Use `--input PATH` to try a separate CSV. A notebook can call `main(["--input", "PATH"])` from the project folder. Keep the original CSV unchanged.
 
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+The threshold is 6. Expect R06, R03 and R05 in that order, including R05 at exactly 6. Try adding R07,north,6,2 to a copy.
