@@ -1,50 +1,82 @@
+"""Reproduce a descriptive trip summary from an explicitly identified input."""
+import argparse
 import csv
+import hashlib
+import json
+import math
 from pathlib import Path
+import re
+import sys
 
-#################
-#   CONSTANTS   #
-#################
-
-DATA_FILE = Path("data/sample.csv")
-VALUE_FIELD = "value"
-COUNT_FIELD = "count"
-TOTAL_FIELD = "total"
-AVERAGE_FIELD = "average"
-EMPTY_AVERAGE = 0.0
+BASE = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
+DEFAULT_INPUT = BASE / "data" / "sample.csv"
 
 
-#################
-#   FUNCTIONS   #
-#################
-
-
-def load_values() -> list[int]:
-    """Load integer values from the sample CSV file"""
-    # Read the named value column from each CSV row
-    with DATA_FILE.open(newline="") as handle:
+def read_values(path):
+    with Path(path).open(encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
-        return [int(row[VALUE_FIELD]) for row in reader]
+        fields = reader.fieldnames
+        if not fields or len(fields) != len(set(fields)) or not {"site", "trips"}.issubset(fields):
+            raise ValueError("CSV needs unique site and trips columns")
+        values = []
+        for record, row in enumerate(reader, 2):
+            if None in row or not str(row.get("site") or "").strip():
+                raise ValueError(f"Record {record}: a nonblank site is required")
+            count = str(row.get("trips") or "").strip()
+            if re.fullmatch(r"[0-9]+", count) is None:
+                raise ValueError(f"Record {record}: trips must be a nonnegative whole number")
+            values.append(int(count))
+        return values
 
 
-def summarize(values: list[int]) -> dict[str, float]:
-    """Summarize the count total and average for the provided values"""
-    total = sum(values)
+def summarize(values):
+    values = list(values)
+    if any(type(value) is not int or value < 0 for value in values):
+        raise ValueError("Trip counts must be nonnegative integers")
     count = len(values)
+    total = sum(values)
+    try:
+        mean = total / count if count else None
+    except OverflowError as error:
+        raise ValueError("Mean exceeds the supported numeric range") from error
+    if mean is not None and not math.isfinite(mean):
+        raise ValueError("Mean exceeds the supported numeric range")
+    return {"records": count, "total_trips": total, "mean_trips_per_record": mean}
 
-    # Avoid division by zero when a dataset has no rows
-    average = total / count if count else EMPTY_AVERAGE
 
-    return {
-        COUNT_FIELD: count,
-        TOTAL_FIELD: total,
-        AVERAGE_FIELD: average,
-    }
+def format_summary(summary):
+    mean = summary["mean_trips_per_record"]
+    displayed = "undefined" if mean is None else f"{mean:.2f}"
+    return (f"Records: {summary['records']}\n"
+            f"Total trips: {summary['total_trips']}\n"
+            f"Mean trips per record: {displayed}")
 
 
-def main() -> None:
-    """Print the summary for the sample dataset"""
-    print(summarize(load_values()))
+def write_report(output, summary, input_path):
+    output, input_path = Path(output), Path(input_path)
+    if output.resolve() == input_path.resolve():
+        raise ValueError("The report path must differ from the retained input")
+    report = {"input_filename": input_path.name,
+              "input_sha256": hashlib.sha256(input_path.read_bytes()).hexdigest(),
+              "unit": "trips per record", **summary}
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(report, sort_keys=True, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    return output
+
+
+def main(argv=()):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
+    parser.add_argument("--output", type=Path, default=Path("outputs/report.json"))
+    args = parser.parse_args(list(argv))
+    try:
+        summary = summarize(read_values(args.input))
+        print(format_summary(summary))
+        output = write_report(args.output, summary, args.input)
+        print(f"Saved {output.as_posix()}")
+    except NotImplementedError as error:
+        print(error)
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:] if "__file__" in globals() and "ipykernel" not in sys.modules else ())
