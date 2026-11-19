@@ -1,0 +1,9 @@
+record_id,station,riders
+N1,North,12
+N2,"North, Annex",0
+S1,South,8
+S1,South,10
+N3,North,
+S2,South,-2
+S3,South,abc
+S4,South,5
