@@ -35,6 +35,8 @@ jobs:
         run: bash verify-course-source.sh
       - name: Retain the native chart outputs for independent review
         run: python -B tests/export_chart_evidence.py
+      - name: Retain dashboard and capstone entrypoints and original CSV output
+        run: python -B tests/export_dashboard_evidence.py
       - name: Retain the original audit evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

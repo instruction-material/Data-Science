@@ -1,50 +1,93 @@
+# %%
+"""Use recorded synthetic trip counts to produce inspectable evidence."""
+import argparse
 import csv
 from pathlib import Path
 
-#################
-#   CONSTANTS   #
-#################
-
-DATA_FILE = Path("data/sample.csv")
-VALUE_FIELD = "value"
-COUNT_FIELD = "count"
-TOTAL_FIELD = "total"
-AVERAGE_FIELD = "average"
-EMPTY_AVERAGE = 0.0
+PROJECT_DIR = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
+DATA_FILE = PROJECT_DIR / "data" / "sample.csv"
+LIMITATION = "Synthetic practice records; these results establish no real-world or causal ranking."
 
 
-#################
-#   FUNCTIONS   #
-#################
+def validate_rows(rows):
+    for record, row in enumerate(rows, start=2):
+        if not isinstance(row.get("site"), str) or not row["site"].strip():
+            raise ValueError(f"Record {record}: site is missing")
+        value = row.get("trips")
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise ValueError(f"Record {record}: trips must be a nonnegative whole number")
 
 
-def load_values() -> list[int]:
-    """Load integer values from the sample CSV file"""
-    # Read the named value column from each CSV row
-    with DATA_FILE.open(newline="") as handle:
+def load_rows(path=DATA_FILE):
+    with Path(path).open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
-        return [int(row[VALUE_FIELD]) for row in reader]
+        if not {"site", "trips"}.issubset(reader.fieldnames or []):
+            raise ValueError("CSV requires site and trips columns")
+        rows = []
+        for record, row in enumerate(reader, start=2):
+            try:
+                trips = int(row.get("trips"))
+            except (TypeError, ValueError) as error:
+                raise ValueError(f"Record {record}: trips must be a whole number") from error
+            rows.append({"site": row.get("site"), "trips": trips})
+    validate_rows(rows)
+    return rows
 
 
-def summarize(values: list[int]) -> dict[str, float]:
-    """Summarize the count total and average for the provided values"""
-    total = sum(values)
-    count = len(values)
-
-    # Avoid division by zero when a dataset has no rows
-    average = total / count if count else EMPTY_AVERAGE
-
-    return {
-        COUNT_FIELD: count,
-        TOTAL_FIELD: total,
-        AVERAGE_FIELD: average,
-    }
+def summarize(rows):
+    validate_rows(rows)
+    count = len(rows)
+    total = sum(row["trips"] for row in rows)
+    return {"count": count, "total": total, "mean": total / count if count else None}
 
 
-def main() -> None:
-    """Print the summary for the sample dataset"""
-    print(summarize(load_values()))
+def select_rows(rows, site=None, minimum=None):
+    """Select from the original input; optional controls combine using AND."""
+    validate_rows(rows)
+    if site is not None and (not isinstance(site, str) or not site.strip()):
+        raise ValueError("site must be a nonempty label or None")
+    if minimum is not None and (isinstance(minimum, bool) or not isinstance(minimum, int) or minimum < 0):
+        raise ValueError("minimum must be a nonnegative whole number or None")
+    return [dict(row) for row in rows
+            if (site is None or row["site"] == site)
+            and (minimum is None or row["trips"] >= minimum)]
+
+
+def render_summary(rows, site=None, minimum=None):
+    summary = summarize(select_rows(rows, site, minimum))
+    lines = ["Selection: " + (site if site is not None else "all sites"),
+             "Minimum trips: " + (str(minimum) if minimum is not None else "none"),
+             f"Records: {summary['count']}", f"Total trips: {summary['total']}"]
+    if summary["mean"] is None:
+        lines.append("No matching records; no measured mean.")
+    else:
+        lines.append(f"Mean trips per record: {summary['mean']:.2f}")
+        if summary["count"] == 1:
+            lines.append("One record only; the selected evidence is limited.")
+    lines.append(LIMITATION)
+    return "\n".join(lines)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Inspect synthetic trip records with a repeated site filter.")
+    parser.add_argument("--input", type=Path, default=DATA_FILE)
+    args = parser.parse_args(argv)
+    rows = load_rows(args.input)
+    try:
+        print(render_summary(rows))
+    except NotImplementedError as error:
+        print(str(error))
+        return
+    while True:
+        try:
+            choice = input("Site (all, a label or quit): ").strip()
+        except EOFError:
+            return
+        if choice == "quit":
+            return
+        site = None if choice in {"", "all"} else choice
+        print(render_summary(rows, site))
 
 
 if __name__ == "__main__":
-    main()
+    main(None if "__file__" in globals() else [])
