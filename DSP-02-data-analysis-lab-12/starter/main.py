@@ -1,21 +1,35 @@
 import csv
+import math
 from pathlib import Path
 
+DATA_FILE = Path(__file__).resolve().parent / "data" / "sample.csv"
 
-def load_values() -> list[int]:
-    with Path("data/sample.csv").open() as handle:
+
+def load_rows(path: str | Path = DATA_FILE) -> list[dict[str, str | None]]:
+    """Load rows without silently changing their original cell text."""
+    with Path(path).open(encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
-        return [int(row["value"]) for row in reader]
+        if reader.fieldnames is None or not {"label", "value"} <= set(reader.fieldnames):
+            raise ValueError("CSV requires label and value columns.")
+        return list(reader)
 
 
-def summarize(values: list[int]) -> dict[str, float]:
-    # TODO: compute count, total, and average.
-    return {"count": 0, "total": 0, "average": 0.0}
+def clean_rows(rows: list[dict[str, str | None]], *,
+               repair_whitespace: bool = False) -> dict[str, object]:
+    """Validate synthetic nonnegative measurements and retain rejection evidence.
 
-
-def main() -> None:
-    print(summarize(load_values()))
+    Each rejected row receives its first applicable reason. Optional whitespace
+    repair affects numeric cells only and counts successfully accepted rows.
+    The caller's row dictionaries and original cell text remain unchanged.
+    """
+    # Classify missing, whitespace, nonnumeric, nonfinite and negative values.
+    # Keep original row numbers and cell text in the rejection evidence.
+    # Complete the default policy before adding optional whitespace repair.
+    raise NotImplementedError("TODO: clean the rows and explain each rejection.")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        print(clean_rows(load_rows()))
+    except NotImplementedError as error:
+        print(error)
