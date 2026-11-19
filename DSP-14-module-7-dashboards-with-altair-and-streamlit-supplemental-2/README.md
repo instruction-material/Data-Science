@@ -1,14 +1,22 @@
-# Module 7: Dashboards with Altair and Streamlit supplemental 2
+# Distinguish Empty Filters from Zero
 
-Course: Data Science in Python
-Module: Module 7: Dashboards with Altair and Streamlit supplemental 2
+Complete `filter_observations` to match the selected day and room. Preserve
+Tuesday Quiet as a measured zero. Wednesday Quiet has no matching observation
+and displays an explanation in place of the chart. In the IDE, run the default
+case and then try `--day Tuesday --room Quiet` and `--day Wednesday --room Quiet`.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
+In the native dashboard, return from Wednesday Quiet to All rooms. Check that
+Studio's 4 observed check-ins repopulate the chart and table. Record the
+three outcomes. A missing measurement remains unavailable. A zero is an observed count.
 
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
+## Run the project
 
-Quick run hint: `python3 main.py`
+Run `python main.py` from the course IDE to inspect the calculation. Select
+`data/sample.csv` to inspect the fictional observations. Use `--csv` with a
+file using the same header to test another case.
+
+To open the dashboard locally, create a virtual environment with Python 3.14,
+install the course repository's locked dependencies with
+`python -m pip install --require-hashes -r /path/to/Data-Science/requirements.txt`,
+then run `python -m streamlit run dashboard.py --server.address 127.0.0.1`
+from this project folder. The Altair chart, table and text use the same data.

@@ -1,3 +1,5 @@
 # Native chart and tabular projects and their transitive dependencies.
 matplotlib==3.11.2
 pandas==3.1.1
+altair==6.3.0
+streamlit==1.67.0

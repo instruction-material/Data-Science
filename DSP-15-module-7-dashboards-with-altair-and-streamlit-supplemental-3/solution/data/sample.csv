@@ -1,5 +1,6 @@
-label,value
-alpha,4
-beta,8
-gamma,11
-delta,17
+day,room,checkins
+Monday,Quiet,6
+Monday,Studio,12
+Tuesday,Quiet,0
+Tuesday,Studio,9
+Wednesday,Studio,4

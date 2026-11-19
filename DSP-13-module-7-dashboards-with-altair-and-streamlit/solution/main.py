@@ -1,49 +1,55 @@
+import argparse
 import csv
 from pathlib import Path
 
-#################
-#   CONSTANTS   #
-#################
-
-DATA_FILE = Path("data/sample.csv")
-VALUE_FIELD = "value"
-COUNT_FIELD = "count"
-TOTAL_FIELD = "total"
-AVERAGE_FIELD = "average"
-EMPTY_AVERAGE = 0.0
+SAMPLE = Path(__file__).parent / "data" / "sample.csv"
 
 
-#################
-#   FUNCTIONS   #
-#################
+def load_observations(path):
+    with path.open(encoding="utf-8", newline="") as stream:
+        reader = csv.DictReader(stream)
+        if reader.fieldnames != ["day", "room", "checkins"]:
+            raise ValueError("Expected the day,room,checkins header")
+        observations = []
+        seen = set()
+        for row in reader:
+            if None in row or None in row.values():
+                raise ValueError(f"Incorrect field count at line {reader.line_num}")
+            day, room = row["day"].strip(), row["room"].strip()
+            checkins = int(row["checkins"])
+            key = day, room
+            if not day or not room or key in seen or checkins < 0:
+                raise ValueError(f"Invalid or repeated day and room at line {reader.line_num}")
+            seen.add(key)
+            observations.append({"day": day, "room": room, "checkins": checkins})
+    return observations
 
 
-def load_values() -> list[int]:
-    """Load integer values from the sample CSV file"""
-    # Read the named value column from each CSV row
-    with DATA_FILE.open(newline="") as handle:
-        reader = csv.DictReader(handle)
-        return [int(row[VALUE_FIELD]) for row in reader]
+def summarize_day(rows, day):
+    """Return rows for the day and the sum of their check-ins."""
+    selected = [row for row in rows if row["day"] == day]
+    return selected, sum(row["checkins"] for row in selected)
 
 
-def summarize(values: list[int]) -> dict[str, float]:
-    """Summarize the count total and average for the provided values"""
-    total = sum(values)
-    count = len(values)
-
-    # Avoid division by zero when a dataset has no rows
-    average = total / count if count else EMPTY_AVERAGE
-
-    return {
-        COUNT_FIELD: count,
-        TOTAL_FIELD: total,
-        AVERAGE_FIELD: average,
-    }
-
-
-def main() -> None:
-    """Print the summary for the sample dataset"""
-    print(summarize(load_values()))
+def main():
+    parser = argparse.ArgumentParser(description="Summarize room check-ins by day")
+    parser.add_argument("--csv", type=Path, default=SAMPLE)
+    parser.add_argument("--day", default="Monday")
+    args = parser.parse_args()
+    try:
+        result = summarize_day(load_observations(args.csv), args.day)
+    except (OSError, ValueError) as error:
+        parser.error(str(error))
+    if result is None:
+        print("TODO: select the day and calculate its total")
+        return
+    selected, total = result
+    if not selected:
+        print(f"No observations for {args.day}.")
+        return
+    print(f"{args.day}: {total} check-ins across {len(selected)} rooms")
+    for row in selected:
+        print(f"{row['room']}: {row['checkins']} check-ins")
 
 
 if __name__ == "__main__":
