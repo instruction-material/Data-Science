@@ -1,14 +1,3 @@
-# data analysis lab 16
+# Filtered Dashboard Build
 
-Course: Data Science in Python
-Module: data analysis lab 16
-
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
-
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+The starter and reference roles implement the concrete Filtered Dashboard Build activity. Each role contains `main.py`, the same six-row synthetic input and complete run instructions. The select_rows function is deliberately unfinished in the starter. Select records for the current site; extend with an inclusive minimum in the optional activity.

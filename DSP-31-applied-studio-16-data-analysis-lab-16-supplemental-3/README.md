@@ -1,14 +1,3 @@
-# Applied Studio 16: data analysis lab 16 supplemental 3
+# Filtered Summary Export
 
-Course: Data Science in Python
-Module: Applied Studio 16: data analysis lab 16 supplemental 3
-
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
-
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+The starter and reference roles implement the concrete Filtered Summary Export activity. Each role contains `main.py`, the same six-row synthetic input and complete run instructions. The write_summary function is deliberately unfinished in the starter. Write the selected summary and filter metadata to the documented UTF-8 CSV schema.

@@ -1,5 +1,7 @@
-label,value
-alpha,4
-beta,8
-gamma,11
-delta,17
+site,trips
+north,2
+north,4
+south,8
+west,0
+west,6
+west,12
