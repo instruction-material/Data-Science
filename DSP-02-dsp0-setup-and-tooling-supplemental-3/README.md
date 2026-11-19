@@ -1,14 +1,11 @@
-# DSP0 Setup and Tooling supplemental 3
+# Check Empty Input and Measured Zero
 
-Course: Data Science in Python
-Module: DSP0 Setup and Tooling supplemental 3
+Run the starter in the course IDE. It opens the six-record setup input.
+Change the default input list in `main.py` to `empty.csv` and `zero.csv`.
+The first file contains a header and no measurements. The second contains
+one measurement of zero. Exported projects can also run with
+`python main.py --csv data/empty.csv data/zero.csv`.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
-
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+Check that the empty file reports zero records and an undefined mean.
+The zero file reports one record and a mean of 0.00. Keep both reports
+with the original result and explain what differed in their denominators.
