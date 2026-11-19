@@ -8,5 +8,10 @@ removed. Keep starter and solution material in the project directory that owns
 it; do not re-add root-level standalone copies or legacy archive folders.
 
 - Course catalog entry: `/Users/jacobanderson/Sites/classes.jacobdanderson.net/front-end/src/stores/courses/data-science-in-python.ts`
-- GitHub repo clone: `/Users/jacobanderson/Documents/Work/Instruction-Material/Data-Science`
+- GitHub repo clone: `/Users/jacobanderson/Documents/Work/Juni/Data Science`
 - Legacy Dropbox source: `/Users/jacobanderson/Documents/Work/Juni/Data Science in Python/dropbox-source`
+
+The `DS1-Mode` and `DS1-Simple-Stats` references accept unsorted numeric lists.
+Median sorts a copy, averages the two middle values for even counts, and leaves
+the original list unchanged. Median and range return `None` for an empty list.
+Run `bash verify-course-source.sh` to check the source layout and statistics cases.
