@@ -1,50 +1,67 @@
 import csv
+import math
 from pathlib import Path
 
-#################
-#   CONSTANTS   #
-#################
-
-DATA_FILE = Path("data/sample.csv")
-VALUE_FIELD = "value"
-COUNT_FIELD = "count"
-TOTAL_FIELD = "total"
-AVERAGE_FIELD = "average"
-EMPTY_AVERAGE = 0.0
+DATA_FILE = Path(__file__).resolve().parent / "data" / "sample.csv"
 
 
-#################
-#   FUNCTIONS   #
-#################
-
-
-def load_values() -> list[int]:
-    """Load integer values from the sample CSV file"""
-    # Read the named value column from each CSV row
-    with DATA_FILE.open(newline="") as handle:
+def load_rows(path: str | Path = DATA_FILE) -> list[dict[str, str | None]]:
+    """Load rows without silently changing their original cell text."""
+    with Path(path).open(encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
-        return [int(row[VALUE_FIELD]) for row in reader]
+        if reader.fieldnames is None or not {"label", "value"} <= set(reader.fieldnames):
+            raise ValueError("CSV requires label and value columns.")
+        return list(reader)
 
 
-def summarize(values: list[int]) -> dict[str, float]:
-    """Summarize the count total and average for the provided values"""
-    total = sum(values)
-    count = len(values)
+def clean_rows(rows: list[dict[str, str | None]], *,
+               repair_whitespace: bool = False) -> dict[str, object]:
+    """Validate synthetic nonnegative measurements and retain rejection evidence.
 
-    # Avoid division by zero when a dataset has no rows
-    average = total / count if count else EMPTY_AVERAGE
-
+    Each rejected row receives its first applicable reason. Optional whitespace
+    repair affects numeric cells only and counts successfully accepted rows.
+    The caller's row dictionaries and original cell text remain unchanged.
+    """
+    values = []
+    rejected = []
+    repaired = 0
+    for row_number, row in enumerate(rows, start=2):
+        original = row.get("value")
+        reason = None
+        number = None
+        text = "" if original is None else original
+        stripped = text.strip()
+        if not stripped:
+            reason = "missing"
+        elif text != stripped and not repair_whitespace:
+            reason = "surrounding whitespace"
+        else:
+            try:
+                number = float(stripped)
+            except ValueError:
+                reason = "not numeric"
+            else:
+                if not math.isfinite(number):
+                    reason = "not finite"
+                elif number < 0:
+                    reason = "negative"
+        if reason is not None:
+            rejected.append({"row": row_number, "label": row.get("label"),
+                             "value": original, "reason": reason})
+        else:
+            values.append(number)
+            if text != stripped:
+                repaired += 1
     return {
-        COUNT_FIELD: count,
-        TOTAL_FIELD: total,
-        AVERAGE_FIELD: average,
+        "values": values,
+        "report": {"rows_loaded": len(rows), "rows_accepted": len(values),
+                   "rows_rejected": len(rejected), "rows_repaired": repaired},
+        "rejected_rows": rejected,
     }
 
 
-def main() -> None:
-    """Print the summary for the sample dataset"""
-    print(summarize(load_values()))
-
-
 if __name__ == "__main__":
-    main()
+    try:
+        print(clean_rows(load_rows()))
+    except NotImplementedError as error:
+        print(error)

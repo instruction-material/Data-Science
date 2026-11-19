@@ -1,5 +1,9 @@
 label,value
 alpha,4
-beta,8
-gamma,11
-delta,17
+beta,
+gamma,apple
+delta,-6
+epsilon,8
+zeta,NaN
+eta," 11 "
+theta,17
