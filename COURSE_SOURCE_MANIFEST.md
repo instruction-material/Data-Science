@@ -68,6 +68,19 @@ Canonical source repository: `Data-Science`
 | `DSP-32-applied-studio-17-data-analysis-lab-17-supplemental-2` |
 | `DSP-33-applied-studio-17-data-analysis-lab-17-supplemental-3` |
 
+## Project Practice Guide packs
+
+Each folder contains a standalone `starter` and `solution` with the same CSV
+fixture and project instructions.
+
+| Activity | Folder |
+| --- | --- |
+| Public Dataset Exploratory Report | `DSP-practice-public-dataset` |
+| Messy CSV Cleaning Challenge | `DSP-practice-cleaning` |
+| Visualization Redesign Project | `DSP-practice-chart-redesign` |
+| Trend Analysis | `DSP-practice-trend` |
+| Self-directed Final Data Story | `DSP-practice-final` |
+
 ## Source Inventory
 
 - Top-level folders: 52
