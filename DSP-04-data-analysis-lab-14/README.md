@@ -1,14 +1,3 @@
-# data analysis lab 14
+# Chart Integrity Build
 
-Course: Data Science in Python
-Module: data analysis lab 14
-
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
-
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+Start with the `starter` folder. The `solution` implements the same chart contract. Each role includes its dataset, native dependency lock and complete run instructions.

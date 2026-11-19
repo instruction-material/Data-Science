@@ -1,0 +1,2 @@
+# Native chart projects and their transitive dependencies.
+matplotlib==3.11.2
