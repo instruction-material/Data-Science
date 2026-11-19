@@ -9,7 +9,7 @@ Canonical source repository: `Data-Science`
 ## Verification Gate
 
 - Run `./verify-course-source.sh` from this repository root before treating the source pack as ready.
-- The verification gate checks for this manifest, the source backlog ledger, source-like files, removed Replit metadata, and any repo-specific readiness files.
+- The verification gate checks for this manifest, the source backlog ledger, source-like files, removed Replit metadata, any repo-specific readiness files, and the standard-library statistics/CSV contract tests.
 - Project-specific unit tests or build commands should still be run inside individual project folders when a project includes its own test harness.
 
 ## Active Catalog Targets

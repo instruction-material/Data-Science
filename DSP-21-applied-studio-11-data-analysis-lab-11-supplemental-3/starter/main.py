@@ -1,21 +1,32 @@
 import csv
 from pathlib import Path
 
-
-def load_values() -> list[int]:
-    with Path("data/sample.csv").open() as handle:
-        reader = csv.DictReader(handle)
-        return [int(row["value"]) for row in reader]
+Number = int | float
+DATA_FILE = Path(__file__).resolve().parent / "data" / "sample.csv"
 
 
-def summarize(values: list[int]) -> dict[str, float]:
-    # TODO: compute count, total, and average.
-    return {"count": 0, "total": 0, "average": 0.0}
+def load_values(path: str | Path = DATA_FILE) -> list[float]:
+    """Read the named numeric column from a well-formed CSV."""
+    with Path(path).open(encoding="utf-8", newline="") as handle:
+        return [float(row["value"]) for row in csv.DictReader(handle)]
 
 
-def main() -> None:
-    print(summarize(load_values()))
+def summarize(values: list[Number]) -> dict[str, Number | None]:
+    """Describe the supplied values; an empty sample has no mean."""
+    count = len(values)
+    total = sum(values)
+    return {"count": count, "total": total,
+            "average": total / count if count else None}
+
+
+def format_report(filename: str, values: list[Number]) -> str:
+    # Include source, rows, total, mean and one interpretation limit.
+    # An empty dataset has an undefined mean, rather than a measured zero.
+    raise NotImplementedError("TODO: format a readable summary report.")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        print(format_report(DATA_FILE.name, load_values()))
+    except NotImplementedError as error:
+        print(error)

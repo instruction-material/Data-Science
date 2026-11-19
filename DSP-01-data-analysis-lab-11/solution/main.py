@@ -1,50 +1,34 @@
 import csv
 from pathlib import Path
 
-#################
-#   CONSTANTS   #
-#################
-
-DATA_FILE = Path("data/sample.csv")
-VALUE_FIELD = "value"
-COUNT_FIELD = "count"
-TOTAL_FIELD = "total"
-AVERAGE_FIELD = "average"
-EMPTY_AVERAGE = 0.0
+Number = int | float
+DATA_FILE = Path(__file__).resolve().parent / "data" / "sample.csv"
 
 
-#################
-#   FUNCTIONS   #
-#################
+def load_values(path: str | Path = DATA_FILE) -> list[float]:
+    """Read the named numeric column from a well-formed CSV."""
+    with Path(path).open(encoding="utf-8", newline="") as handle:
+        return [float(row["value"]) for row in csv.DictReader(handle)]
 
 
-def load_values() -> list[int]:
-    """Load integer values from the sample CSV file"""
-    # Read the named value column from each CSV row
-    with DATA_FILE.open(newline="") as handle:
-        reader = csv.DictReader(handle)
-        return [int(row[VALUE_FIELD]) for row in reader]
-
-
-def summarize(values: list[int]) -> dict[str, float]:
-    """Summarize the count total and average for the provided values"""
-    total = sum(values)
+def summarize(values: list[Number]) -> dict[str, Number | None]:
+    """Describe the supplied values; an empty sample has no mean."""
     count = len(values)
-
-    # Avoid division by zero when a dataset has no rows
-    average = total / count if count else EMPTY_AVERAGE
-
-    return {
-        COUNT_FIELD: count,
-        TOTAL_FIELD: total,
-        AVERAGE_FIELD: average,
-    }
+    total = sum(values)
+    return {"count": count, "total": total,
+            "average": total / count if count else None}
 
 
-def main() -> None:
-    """Print the summary for the sample dataset"""
-    print(summarize(load_values()))
+def extended_summary(values: list[Number]) -> dict[str, Number | None]:
+    """Optional minimum/maximum/range comparison; preserve the input."""
+    minimum = min(values) if values else None
+    maximum = max(values) if values else None
+    return {**summarize(values), "minimum": minimum, "maximum": maximum,
+            "range": maximum - minimum if values else None}
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        print(summarize(load_values()))
+    except NotImplementedError as error:
+        print(error)

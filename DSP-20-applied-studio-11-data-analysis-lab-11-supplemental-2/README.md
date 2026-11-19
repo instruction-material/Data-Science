@@ -1,14 +1,22 @@
-# Applied Studio 11: data analysis lab 11 supplemental 2
+# Median and mode comparison
 
-Course: Data Science in Python
-Module: Applied Studio 11: data analysis lab 11 supplemental 2
+Complete `median` and `modes` in the starter, then run `summarize_distribution`.
+The supplied count/total/mean helper and CSV loader are already complete.
+Use a sorted copy for median so the original row order remains available.
+For an even sample, average the two middle values. An empty median is `None`.
+Return every tied mode in first-appearance order; an empty sample has `[]` modes.
+When every value appears once, every value is tied for highest frequency.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
+Hand checks:
 
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
+| Values | Mean | Median | Modes |
+| --- | ---: | ---: | --- |
+| 4, 8, 11, 17 | 10 | 9.5 | 4, 8, 11, 17 |
+| 1, 2, 2, 3, 100 | 21.6 | 2 | 2 |
+| 3, 1, 3, 1 | 2 | 2 | 3, 1 |
 
-Quick run hint: `python3 main.py`
+Explain why the extreme value changes mean more than median. Neither statistic
+alone establishes whether the extreme row is an error.
+The CSV is synthetic and its `value` column contains finite numbers.
+Run `python3 main.py` in a role folder, or run its full path from elsewhere.
+`load_values(path)` accepts another CSV with a `value` header.
