@@ -36,7 +36,8 @@ The grouped-summary studio has three distinct source pairs:
   meaning permits that normalization. Original row dictionaries stay intact.
 - `DSP-24-applied-studio-13-data-analysis-lab-13-supplemental-2` supplies grouping
   and asks for a Markdown table plus a denominator-aware interpretation. The
-  script cells also work in a notebook; the terminal prints the same table.
+  script cells also work in a notebook opened in the project directory; the
+  terminal prints the same table. A notebook can also pass an explicit CSV path.
 - `DSP-25-applied-studio-13-data-analysis-lab-13-supplemental-3` compares mean
   with median and maximum. The west sample has mean 34, median 1 and maximum
   100, making the effect of its extreme value visible.

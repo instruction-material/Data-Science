@@ -109,6 +109,19 @@ class GroupedSummariesTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "category and value"):
                     m.load_rows(path)
 
+    def test_actual_notebook_cells_without_a_file_global(self):
+        for role in ["starter", "solution"]:
+            project = ROOT / FOLDERS[1] / role
+            code = ("from pathlib import Path; scope = {'__name__': 'course_notebook'}; "
+                    "exec(compile(Path('main.py').read_text(), '<notebook cell>', 'exec'), scope); "
+                    "rows=scope['load_rows'](); print(len(rows)); "
+                    "print(scope['summarize_groups'](rows, normalize_labels=True)['north']['average'])")
+            result = subprocess.run([sys.executable, "-I", "-B", "-c", code], cwd=project,
+                                    capture_output=True, text=True, timeout=10)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout, "8\n8.0\n")
+            self.assertEqual(result.stderr, "")
+
     def test_all_six_actual_entrypoints_from_an_unrelated_working_directory(self):
         with tempfile.TemporaryDirectory() as temporary:
             for index, folder in enumerate(FOLDERS):

@@ -5,7 +5,8 @@ import math
 from pathlib import Path
 from statistics import median
 
-DATA_FILE = Path(__file__).resolve().parent / "data" / "sample.csv"
+SOURCE_DIRECTORY = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
+DATA_FILE = SOURCE_DIRECTORY / "data" / "sample.csv"
 
 
 def load_rows(path=DATA_FILE):
