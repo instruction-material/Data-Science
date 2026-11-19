@@ -1,21 +1,28 @@
 import csv
 from pathlib import Path
 
-
-def load_values() -> list[int]:
-    with Path("data/sample.csv").open() as handle:
-        reader = csv.DictReader(handle)
-        return [int(row["value"]) for row in reader]
+Number = int | float
+DATA_FILE = Path(__file__).resolve().parent / "data" / "sample.csv"
 
 
-def summarize(values: list[int]) -> dict[str, float]:
-    # TODO: compute count, total, and average.
-    return {"count": 0, "total": 0, "average": 0.0}
+def load_values(path: str | Path = DATA_FILE) -> list[float]:
+    """Read the named numeric column from a well-formed CSV."""
+    with Path(path).open(encoding="utf-8", newline="") as handle:
+        return [float(row["value"]) for row in csv.DictReader(handle)]
 
 
-def main() -> None:
-    print(summarize(load_values()))
+def summarize(values: list[Number]) -> dict[str, Number | None]:
+    # Empty input has count 0, total 0 and average None.
+    raise NotImplementedError("TODO: compute count, total, and mean.")
+
+
+def extended_summary(values: list[Number]) -> dict[str, Number | None]:
+    # Optional extension: add minimum, maximum and range without changing values.
+    raise NotImplementedError("TODO: add the optional minimum, maximum, and range.")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        print(summarize(load_values()))
+    except NotImplementedError as error:
+        print(error)

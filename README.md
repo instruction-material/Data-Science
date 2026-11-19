@@ -14,4 +14,17 @@ it; do not re-add root-level standalone copies or legacy archive folders.
 The `DS1-Mode` and `DS1-Simple-Stats` references accept unsorted numeric lists.
 Median sorts a copy, averages the two middle values for even counts, and leaves
 the original list unchanged. Median and range return `None` for an empty list.
-Run `bash verify-course-source.sh` to check the source layout and statistics cases.
+The CSV summary studio now has three distinct paired projects:
+
+- `DSP-01-data-analysis-lab-11`: count, total and mean, with optional minimum,
+  maximum and range. Empty samples have an undefined mean (`None`).
+- `DSP-20-applied-studio-11-data-analysis-lab-11-supplemental-2`: median and all
+  tied modes, including unsorted/even samples and an extreme-value comparison.
+- `DSP-21-applied-studio-11-data-analysis-lab-11-supplemental-3`: a readable
+  five-line report with source identity, row count and an interpretation limit.
+
+Each uses its own bundled synthetic CSV and the Python standard library.
+The loader resolves its dataset beside the source, including runs from another
+working directory. The role README states the exact completion contract.
+Run `bash verify-course-source.sh` to check the source layout, statistics and
+CSV projects. The remaining generic packs still need curriculum alignment.

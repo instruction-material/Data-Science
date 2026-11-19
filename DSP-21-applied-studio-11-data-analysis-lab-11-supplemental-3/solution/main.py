@@ -1,50 +1,38 @@
 import csv
 from pathlib import Path
 
-#################
-#   CONSTANTS   #
-#################
-
-DATA_FILE = Path("data/sample.csv")
-VALUE_FIELD = "value"
-COUNT_FIELD = "count"
-TOTAL_FIELD = "total"
-AVERAGE_FIELD = "average"
-EMPTY_AVERAGE = 0.0
+Number = int | float
+DATA_FILE = Path(__file__).resolve().parent / "data" / "sample.csv"
 
 
-#################
-#   FUNCTIONS   #
-#################
+def load_values(path: str | Path = DATA_FILE) -> list[float]:
+    """Read the named numeric column from a well-formed CSV."""
+    with Path(path).open(encoding="utf-8", newline="") as handle:
+        return [float(row["value"]) for row in csv.DictReader(handle)]
 
 
-def load_values() -> list[int]:
-    """Load integer values from the sample CSV file"""
-    # Read the named value column from each CSV row
-    with DATA_FILE.open(newline="") as handle:
-        reader = csv.DictReader(handle)
-        return [int(row[VALUE_FIELD]) for row in reader]
-
-
-def summarize(values: list[int]) -> dict[str, float]:
-    """Summarize the count total and average for the provided values"""
-    total = sum(values)
+def summarize(values: list[Number]) -> dict[str, Number | None]:
+    """Describe the supplied values; an empty sample has no mean."""
     count = len(values)
-
-    # Avoid division by zero when a dataset has no rows
-    average = total / count if count else EMPTY_AVERAGE
-
-    return {
-        COUNT_FIELD: count,
-        TOTAL_FIELD: total,
-        AVERAGE_FIELD: average,
-    }
+    total = sum(values)
+    return {"count": count, "total": total,
+            "average": total / count if count else None}
 
 
-def main() -> None:
-    """Print the summary for the sample dataset"""
-    print(summarize(load_values()))
+def format_report(filename: str, values: list[Number]) -> str:
+    """Report the measured rows separately from their interpretation."""
+    summary = summarize(values)
+    average = summary["average"]
+    mean_text = f"{average:g}" if average is not None else "undefined (no rows)"
+    return (f"Source: {filename}\n"
+            f"Rows: {summary['count']}\n"
+            f"Total: {summary['total']:g}\n"
+            f"Mean: {mean_text}\n"
+            "Caution: This describes the loaded rows; it does not establish a cause.")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        print(format_report(DATA_FILE.name, load_values()))
+    except NotImplementedError as error:
+        print(error)
