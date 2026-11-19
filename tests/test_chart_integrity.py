@@ -173,5 +173,21 @@ class ChartFigureTests(unittest.TestCase):
                         self.assertIn("TODO: make the labeled", result.stdout)
                     self.assertEqual(output.with_name("actual-weak.svg").exists(), index == 1)
 
+    def test_real_notebook_entrypoint_ignores_kernel_cli_arguments(self):
+        for index, folder in enumerate(FOLDERS):
+            for role in ["starter", "solution"]:
+                with self.subTest(folder=folder, role=role), tempfile.TemporaryDirectory() as tmp:
+                    source = ROOT / folder / role
+                    data = Path(tmp) / "data"
+                    data.mkdir()
+                    (data / "sample.csv").write_bytes((source / "data" / "sample.csv").read_bytes())
+                    code = "import sys; sys.argv=['ipykernel_launcher','-f','kernel.json']; ns={'__name__':'__main__'}; exec(" + repr((source / "main.py").read_text()) + ",ns); assert len(ns['load_rows']())==6"
+                    result = subprocess.run([sys.executable, "-B", "-c", code], cwd=tmp,
+                        capture_output=True, text=True, env={**os.environ, "MPLBACKEND": "Agg"}, timeout=40)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertIn("west | 3 | 18 | 6.00", result.stdout)
+                    self.assertEqual((Path(tmp) / "chart.svg").exists(), role == "solution")
+                    self.assertFalse((Path(tmp) / "-f").exists())
+
 
 if __name__ == "__main__": unittest.main()

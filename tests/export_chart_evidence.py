@@ -24,7 +24,7 @@ for folder, metric in [("DSP-04-data-analysis-lab-14", "mean"),
         fig.savefig(OUT / (name + "." + extension), bbox_inches="tight")
     ax = fig.axes[0]
     observations.append(dict(name=name, source=folder, summary=summary,
-        heights=[p.get_height() for p in ax.patches], baseline=ax.get_ylim()[0],
+        heights=[float(p.get_height()) for p in ax.patches], baseline=float(ax.get_ylim()[0]),
         title=ax.get_title(), xlabel=ax.get_xlabel(), ylabel=ax.get_ylabel(),
         annotations=[t.get_text() for t in ax.texts]))
     if "supplemental" in folder:

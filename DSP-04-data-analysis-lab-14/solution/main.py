@@ -96,4 +96,4 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    main()
+    main(None if "__file__" in globals() else [])
