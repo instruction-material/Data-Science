@@ -18,8 +18,11 @@ def mean(nums):
 def median(nums):
     if len(nums) == 0:
         return None
-    middle = int(len(nums) / 2)
-    return nums[middle]
+    ordered = sorted(nums)
+    middle = len(ordered) // 2
+    if len(ordered) % 2 == 1:
+        return ordered[middle]
+    return (ordered[middle - 1] + ordered[middle]) / 2
 
 
 def my_max(nums):
@@ -43,6 +46,8 @@ def my_min(nums):
 
 
 def my_range(nums):
+    if len(nums) == 0:
+        return None
     return my_max(nums) - my_min(nums)
 
 
