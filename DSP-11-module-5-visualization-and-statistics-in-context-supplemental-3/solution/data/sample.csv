@@ -1,5 +1,7 @@
-label,value
-alpha,4
-beta,8
-gamma,11
-delta,17
+session,temperature_c,visits
+A,10,3
+A,11,2
+A,12,1
+B,20,8
+B,21,7
+B,22,6

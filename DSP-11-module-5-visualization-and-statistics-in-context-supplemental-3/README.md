@@ -1,14 +1,5 @@
-# Module 5: Visualization and Statistics in Context supplemental 3
+# Compare pooled and within-session correlation
 
-Course: Data Science in Python
-Module: Module 5: Visualization and Statistics in Context supplemental 3
+Run main.py in the site IDE or use python main.py with native Python. Use --input PATH in a terminal to compare a copied CSV. Keep the original input. The project uses the standard library.
 
-Use the starter folder first. The starter is intentionally incomplete, and the solution shows one clean way to finish the same build after the student has worked through it.
-
-Suggested flow:
-- Read the module brief and identify the core requirement.
-- Complete the TODO markers in the starter implementation.
-- Test at least one custom case beyond the default example.
-- Compare against the solution only after the student has a working draft.
-
-Quick run hint: `python3 main.py`
+Six paired rows show positive pooled correlation. Each three-record session has r = -1. Use separate denominators. A constant or single-point set has undefined r, reported as null.

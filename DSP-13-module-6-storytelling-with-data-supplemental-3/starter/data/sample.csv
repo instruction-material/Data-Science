@@ -1,5 +1,4 @@
-label,value
-alpha,4
-beta,8
-gamma,11
-delta,17
+period,booked,seats
+early,0,0
+late,14,20
+late,10,20

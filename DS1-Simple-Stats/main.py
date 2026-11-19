@@ -67,8 +67,12 @@ def summary(nums):
 
 data1 = [-21, -15, -60, -60, -45, -34, -20, -21, -10, -30]
 data2 = [54, 54, 56, 56, 56, 51, 57, 57, 57, 58, 51, 54]
-data3 = [32, 43, 87, 56, 34, 21, 21, 90, 76, 72]
+data3 = [32, 43, 87, 56, 34, 21, 21, 90, 76, 72, 63]
 
-summary(data1)
-summary(data2)
-summary(data3)
+def main():
+    for values in (data1, data2, data3):
+        summary(values)
+
+
+if __name__ == "__main__":
+    main()
